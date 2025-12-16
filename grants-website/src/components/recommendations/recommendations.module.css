@@ -1,0 +1,131 @@
+.recommendationsContainer {
+  max-width: 998px;
+  margin: 40px auto;
+}
+
+.title {
+  font-size: 45px;
+  font-weight: 600;
+  color: rgba(243, 243, 243, 1);
+  margin-bottom: 25px;
+}
+
+.carouselContainer {
+  overflow-x: auto;
+  cursor: grab;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory; /* Привязка к слайдам */
+}
+
+.carouselContainer::-webkit-scrollbar {
+  display: none;
+}
+
+.carouselContainer:active {
+  cursor: grabbing;
+}
+
+.carouselTrack {
+  display: flex;
+  transition: transform 0.5s cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+.slide {
+  min-width: 100%;
+  flex-shrink: 0;
+  scroll-snap-align: start;
+}
+
+.cardsContainer {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  padding: 0 10px;
+}
+
+.card {
+  padding: 24px;
+  border-radius: 22px;
+  border: 1px solid rgba(6, 173, 247, 0.32);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  color: white;
+  height: 261px;
+  justify-content: space-between;
+}
+
+.scholarshipName {
+  font-weight: 700;
+  line-height: 26px;
+}
+
+.targetText {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.dotsContainer {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(6, 173, 247, 0.2);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dot:hover {
+  background: rgba(6, 173, 247, 0.4);
+  transform: scale(1.2);
+}
+
+.activeDot {
+  background: rgba(255, 255, 255, 1);
+}
+
+/* Плавная анимация для карточек */
+.card {
+  animation: slideIn 0.5s ease-out forwards;
+  animation-delay: calc(var(--card-index, 0) * 0.1s);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Эффект инерции при скролле */
+.carouselContainer {
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain; /* Предотвращает скролл родителя */
+}
+
+/* Плавное появление точек */
+.dotsContainer {
+  animation: fadeIn 0.5s ease-out 0.3s both;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
