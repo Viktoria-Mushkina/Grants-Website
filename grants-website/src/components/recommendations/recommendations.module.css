@@ -107,14 +107,12 @@
   }
 }
 
-/* Эффект инерции при скролле */
 .carouselContainer {
   scroll-behavior: smooth;
   scroll-snap-type: x mandatory;
-  overscroll-behavior-x: contain; /* Предотвращает скролл родителя */
+  overscroll-behavior-x: contain;
 }
 
-/* Плавное появление точек */
 .dotsContainer {
   animation: fadeIn 0.5s ease-out 0.3s both;
 }
