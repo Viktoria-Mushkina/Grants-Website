@@ -1,0 +1,1 @@
+export { ScholarshipTable } from './scholarship-table';

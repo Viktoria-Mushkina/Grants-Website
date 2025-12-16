@@ -1,0 +1,1 @@
+export { scholarshipsData } from './scholarshipsData';

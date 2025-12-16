@@ -1,0 +1,67 @@
+.tableContainer {
+  overflow-x: auto;
+  max-height: 600px;
+  overflow-y: auto;
+  border: 1px solid rgba(6, 173, 247, 0.32);
+  border-radius: 50px;
+  margin: 0 auto;
+  max-width: 978px;
+  padding: 10px;
+}
+
+/* Для красивого скролла (опционально) */
+.tableContainer::-webkit-scrollbar {
+  width: 3px;
+}
+
+.tableContainer::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tableContainer::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 1);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+}
+
+.row {
+  cursor: pointer;
+  position: relative;
+}
+.row::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 900px;
+  height: 1px;
+  background-color: white;
+}
+
+.cell {
+  padding: 30px;
+  vertical-align: top;
+}
+
+@media (max-width: 768px) {
+  .tableContainer {
+    padding: 15px;
+    border-radius: 25px;
+  }
+
+  .cell {
+    padding: 20px 8px;
+    font-size: 13px;
+  }
+
+  .row::after,
+  .row::before {
+    max-width: 100%;
+  }
+}
