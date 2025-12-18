@@ -1,0 +1,111 @@
+.searchContainer {
+  position: relative;
+  margin: 0 auto 34px;
+  max-width: 978px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 30px;
+  align-items: center;
+}
+
+.searchInputWrapper {
+  position: relative;
+}
+
+.searchInput {
+  padding: 18px 25px;
+  border: 1px solid rgba(6, 173, 247, 0.32);
+  border-radius: 20px;
+  transition: all 0.3s ease;
+  outline: none;
+  width: 100%;
+}
+
+.filterBtn {
+  height: 60px;
+  width: 60px;
+  border: 1px solid rgba(6, 173, 247, 0.32);
+  border-radius: 50%;
+}
+.filterBtn img {
+  padding: 13px;
+}
+.searchInput:focus {
+  box-shadow: 0 4px 25px rgba(6, 173, 247, 0.2);
+}
+
+.searchInput::placeholder {
+  color: rgba(255, 255, 255, 1);
+}
+
+.dropdown,
+.noResults {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  border: 1px solid rgba(6, 173, 247, 0.32);
+  border-radius: 20px;
+  z-index: 1000;
+  overflow-y: auto;
+  animation: fadeIn 0.2s ease;
+  background-color: rgba(1, 38, 53, 0.2);
+  backdrop-filter: blur(10px);
+  margin-top: 8px;
+  font-weight: 600;
+}
+.noResults {
+  padding: 18px 25px;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.resultItem {
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(6, 173, 247, 0.08);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.2s ease;
+}
+
+.resultItem:hover,
+.resultItem.selected {
+  background: rgba(6, 173, 247, 0.05);
+  border-left: 2px solid rgba(6, 173, 247, 0.32);
+}
+
+.resultItem:hover .selectIndicator {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .searchContainer {
+    margin-bottom: 30px;
+    padding: 0 15px;
+  }
+
+  .searchInput {
+    padding: 14px 45px 14px 16px;
+    font-size: 15px;
+  }
+
+  .resultItem {
+    padding: 14px 16px;
+  }
+
+  .scholarshipName {
+    font-size: 15px;
+  }
+}
