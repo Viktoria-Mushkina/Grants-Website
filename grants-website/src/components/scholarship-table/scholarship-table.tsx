@@ -10,16 +10,14 @@ export const ScholarshipTable: React.FC<ScholarshipTableProps> = ({
 }) => {
   return (
     <div className={styles.tableContainer}>
-      <table className={styles.table}>
-        <tbody>
-          {scholarships.map((scholarship) => (
-            <tr key={scholarship.id} className={styles.row}>
-              <td className={styles.cell}>{scholarship.name}</td>
-              <td className={styles.cell}>{scholarship.type}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div className={styles.table}>
+        {scholarships.map((scholarship) => (
+          <div key={scholarship.id} className={styles.row}>
+            <div className={styles.cell}>{scholarship.name}</div>
+            <div className={styles.cell}>{scholarship.type}</div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

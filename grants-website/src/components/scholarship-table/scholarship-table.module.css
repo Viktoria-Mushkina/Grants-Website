@@ -6,10 +6,9 @@
   border-radius: 50px;
   margin: 0 auto;
   max-width: 978px;
-  padding: 10px;
+  padding: 28px 17px;
 }
 
-/* Для красивого скролла (опционально) */
 .tableContainer::-webkit-scrollbar {
   width: 3px;
 }
@@ -24,29 +23,25 @@
 
 .table {
   width: 100%;
-  border-collapse: collapse;
   min-width: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .row {
   cursor: pointer;
   position: relative;
+  display: flex;
+  justify-content: space-between;
+  background-color: rgba(6, 173, 247, 0.32);
+  border-radius: 70px;
 }
-.row::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  max-width: 900px;
-  height: 1px;
-  background-color: white;
+.row:hover {
+  background-color: #0591cf;
 }
-
 .cell {
-  padding: 30px;
-  vertical-align: top;
+  padding: 20px;
 }
 
 @media (max-width: 768px) {
@@ -58,10 +53,5 @@
   .cell {
     padding: 20px 8px;
     font-size: 13px;
-  }
-
-  .row::after,
-  .row::before {
-    max-width: 100%;
   }
 }
