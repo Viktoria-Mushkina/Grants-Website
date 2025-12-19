@@ -1,0 +1,1 @@
+export {ScholarshipDetailsModal} from './scholarship-details-modal'

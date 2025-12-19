@@ -1,0 +1,211 @@
+.container {
+  border-radius: 58px;
+  padding: 35px 40px;
+  border: 1px solid rgba(6, 173, 247, 0.32);
+  background: rgba(1, 38, 53, 0.2);
+  color: rgba(255, 255, 255, 1);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: flex-end;
+}
+.closeButton {
+  font-size: 50px;
+  cursor: pointer;
+  color: rgba(217, 217, 217, 1);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  line-height: 25px;
+}
+
+.title {
+  font-size: 23px;
+  margin-bottom: 30px;
+  font-weight: 600;
+}
+
+.description p,
+.position {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.detailsGrid {
+  display: grid;
+  grid-template-columns: 1.75fr 0.75fr 0.75fr 1fr 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 20px;
+  margin-top: 10px;
+  grid-template-areas:
+    "main-info main-info main-info main-info study-info study-info"
+    "requirements requirements additional additional additional contacts";
+}
+
+.detailCard:nth-child(1) {
+  grid-area: main-info;
+}
+
+.detailCard:nth-child(2) {
+  grid-area: study-info;
+}
+
+.detailCard:nth-child(3) {
+  grid-area: requirements;
+}
+
+.detailCard:nth-child(4) {
+  grid-area: contacts;
+}
+
+.detailCard:nth-child(5) {
+  grid-area: additional;
+}
+
+.detailCard {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  background: rgba(6, 173, 247, 0.32);
+  border-radius: 48px;
+  padding: 25px;
+}
+.detailCard h4 {
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.item {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.arrayItem,
+.circleItem {
+  border: 1px solid rgba(6, 173, 247, 0.2);
+  background-color: rgba(1, 38, 53, 0.2);
+  padding: 10px 8px;
+  border-radius: 23px;
+  width: fit-content;
+  font-size: 17px;
+}
+
+.circleItem {
+  padding: 6px 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.paymentAmount {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.achievements {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.emailLink,
+.phoneLink {
+  transition: color 0.2s;
+  color: white;
+}
+
+.emailLink:hover,
+.phoneLink:hover {
+  text-decoration: underline;
+}
+
+.procedureList {
+  list-style-position: inside;
+  padding-left: 0;
+  margin: 0;
+  counter-reset: step-counter;
+}
+
+.detailsButtonContainer {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.detailsButton {
+  background-color: rgba(6, 173, 247, 0.2);
+  padding: 16px 40px;
+  border-radius: 30px;
+  color: white;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+.detailItem {
+}
+.detailsButton:hover {
+  transform: translateY(-3px);
+  background-color: #0591cf;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 20px;
+    margin-top: 15px;
+    border-radius: 25px;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .closeButton {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 40px;
+  }
+
+  .title {
+    font-size: 22px;
+    margin-right: 50px;
+  }
+
+  .mainInfo {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  /* На мобильных - перестраиваем сетку в один столбец */
+  .detailsGrid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto; /* Автоматические строки */
+    grid-template-areas:
+      "main-info"
+      "study-info"
+      "requirements"
+      "contacts"
+      "additional";
+  }
+
+  .detailItem {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .detailItem strong {
+    text-align: left;
+    margin-left: 0;
+  }
+
+  .detailsButton {
+    width: 100%;
+    padding: 16px 20px;
+  }
+}
