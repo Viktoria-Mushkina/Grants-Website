@@ -1,0 +1,234 @@
+.filterContainer {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  transition: all 0.3s ease;
+}
+
+/* Кнопка фильтра */
+.filterToggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+
+  height: 60px;
+  width: 60px;
+  border: 1px solid rgba(6, 173, 247, 0.32);
+  border-radius: 50%;
+}
+
+.filterToggle:hover {
+  background: rgba(6, 173, 247, 0.4);
+  transform: translateY(-2px);
+}
+
+.filterToggle img {
+  width: 24px;
+  height: 24px;
+  transition: opacity 0.3s ease;
+}
+
+.closeIcon {
+  position: absolute;
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  opacity: 0;
+  animation: fadeIn 0.3s ease forwards;
+}
+
+.filterContainer.expanded .filterToggle .closeIcon {
+  opacity: 1;
+}
+
+.filterContainer.expanded .filterToggle img {
+  opacity: 0;
+}
+
+/* Контент фильтров (появляется слева) */
+.filterContent {
+  position: absolute;
+  top: 0;
+  right: 60px; /* Справа от кнопки */
+  background: rgba(1, 38, 53, 0.95);
+  border-radius: 11px;
+  border: 1px solid rgba(6, 173, 247, 0.32);
+  padding: 20px;
+  width: 350px;
+  min-height: 50px;
+  backdrop-filter: blur(10px);
+  box-shadow: -5px 0 20px rgba(0, 0, 0, 0.3);
+  animation: slideFromRight 0.3s ease-out;
+  z-index: 5;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.filterHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.filterHeader h3 {
+  margin: 0;
+  color: white;
+  font-size: 18px;
+}
+
+.clearButton {
+  background: rgba(6, 173, 247, 0.2);
+  border: 1px solid rgba(6, 173, 247, 0.32);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 15px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.3s ease;
+}
+
+.clearButton:hover {
+  background: rgba(6, 173, 247, 0.4);
+}
+
+/* Список фильтров */
+.filtersList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.filterSection {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  padding: 10px;
+  transition: all 0.3s ease;
+}
+
+.filterSection:hover {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.filterSectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding: 5px 0;
+  font-weight: 600;
+  color: white;
+  font-size: 14px;
+}
+
+.arrow {
+  transition: transform 0.3s ease;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+}
+
+.filterOptions {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.filterOption {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 6px 0;
+  border-radius: 5px;
+  transition: background-color 0.2s;
+}
+
+.filterOption:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.filterOption input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.filterOption span {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 13px;
+  flex: 1;
+}
+
+.activeFilters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.activeFilterTag {
+  background: rgba(6, 173, 247, 0.3);
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  border: 1px solid rgba(6, 173, 247, 0.2);
+  color: white;
+}
+
+/* Анимации */
+@keyframes slideFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .filterContainer {
+    position: static;
+  }
+
+  .filterContent {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    right: auto;
+    width: 90%;
+    max-width: 350px;
+    max-height: 400px;
+  }
+
+  .filterHeader {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+
+  .clearButton {
+    width: 100%;
+  }
+}

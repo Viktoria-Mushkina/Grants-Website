@@ -16,6 +16,10 @@ function App() {
   const [selectedScholarship, setSelectedScholarship] =
     useState<Scholarship | null>(null);
 
+  const handleFilterChange = (filtered: Scholarship[]) => {
+    setFilteredScholarships(filtered);
+  };
+
   const handleSelectScholarship = (scholarship: Scholarship) => {
     setSelectedScholarship(scholarship);
   };
@@ -50,6 +54,7 @@ function App() {
         <ScholarshipSearch
           scholarships={scholarshipsData}
           onSelect={handleSelectScholarship}
+          onFilterChange={handleFilterChange}
         />
 
         {selectedScholarship && (

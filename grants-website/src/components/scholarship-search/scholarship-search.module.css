@@ -7,8 +7,7 @@
   gap: 30px;
   align-items: center;
 }
-
-.searchInputWrapper {
+.searchSection {
   position: relative;
 }
 
@@ -19,6 +18,11 @@
   transition: all 0.3s ease;
   outline: none;
   width: 100%;
+}
+
+/* Уменьшенный инпут при открытых фильтрах */
+.inputCollapsed {
+  width: 300px;
 }
 
 .filterBtn {
@@ -37,7 +41,32 @@
 .searchInput::placeholder {
   color: rgba(255, 255, 255, 1);
 }
+.filterBtn:hover {
+  background: rgba(6, 173, 247, 0.4);
+  transform: translateY(-2px);
+}
 
+.filterBtnActive {
+  background: rgba(6, 173, 247, 0.4);
+  border-color: rgba(6, 173, 247, 0.8);
+}
+
+.closeIcon {
+  position: absolute;
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  opacity: 0;
+  animation: fadeIn 0.3s ease forwards;
+}
+
+.filterBtnActive .closeIcon {
+  opacity: 1;
+}
+
+.filterBtnActive img {
+  opacity: 0;
+}
 .dropdown,
 .noResults {
   position: absolute;
@@ -89,7 +118,6 @@
   transform: translateX(0);
 }
 
-/* Адаптивность */
 @media (max-width: 768px) {
   .searchContainer {
     margin-bottom: 30px;

@@ -32,26 +32,48 @@ export const Recommendations: React.FC<RecommendationsProps> = ({
   const [visibleScholarships, setVisibleScholarships] = useState<
     Scholarship[][]
   >([]);
-  const totalSlides = visibleScholarships.length;
+  const prevScholarshipsRef = useRef<Scholarship[]>([]);
 
+  // Используем useRef для хранения totalSlides чтобы избежать зависимостей
+  const totalSlidesRef = useRef(0);
+
+  // Мемоизируем функцию goToSlide без зависимостей
+  const goToSlide = useCallback((index: number) => {
+    const totalSlides = totalSlidesRef.current;
+    if (totalSlides === 0) return;
+
+    if (index < 0) index = 0;
+    if (index >= totalSlides) index = totalSlides - 1;
+
+    setCurrentSlide(index);
+    setTranslateX(-index * 100);
+  }, []);
+
+  // Оптимизированный useEffect с проверкой на реальные изменения
   useEffect(() => {
-    const slides: Scholarship[][] = [];
-    for (let i = 0; i < scholarships.length; i += 3) {
-      slides.push(scholarships.slice(i, i + 3));
+    // Проверяем, действительно ли данные изменились
+    const hasChanged =
+      JSON.stringify(prevScholarshipsRef.current) !==
+      JSON.stringify(scholarships);
+
+    if (hasChanged) {
+      const slides: Scholarship[][] = [];
+      for (let i = 0; i < scholarships.length; i += 3) {
+        slides.push(scholarships.slice(i, i + 3));
+      }
+      setVisibleScholarships(slides);
+      totalSlidesRef.current = slides.length;
+
+      // Сброс слайда при изменении данных только если есть реальные изменения
+      if (slides.length > 0) {
+        setCurrentSlide(0);
+        setTranslateX(0);
+      }
+
+      // Сохраняем текущие данные для следующего сравнения
+      prevScholarshipsRef.current = [...scholarships];
     }
-    setVisibleScholarships(slides);
   }, [scholarships]);
-
-  const goToSlide = useCallback(
-    (index: number) => {
-      if (index < 0) index = 0;
-      if (index >= totalSlides) index = totalSlides - 1;
-
-      setCurrentSlide(index);
-      setTranslateX(-index * 100);
-    },
-    [totalSlides]
-  );
 
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -63,7 +85,8 @@ export const Recommendations: React.FC<RecommendationsProps> = ({
     if (!isDragging) return;
 
     let currentX = e.clientX - startX;
-    const maxTranslate = -(totalSlides - 1) * 100;
+    const totalSlides = totalSlidesRef.current;
+    const maxTranslate = totalSlides > 0 ? -(totalSlides - 1) * 100 : 0;
 
     if (currentX > 0) currentX = 0;
     if (currentX < maxTranslate) currentX = maxTranslate;
@@ -71,21 +94,21 @@ export const Recommendations: React.FC<RecommendationsProps> = ({
     setTranslateX(currentX);
   };
 
-  const handleMouseUp = () => {
+  const handleMouseUp = useCallback(() => {
     if (!isDragging) return;
 
     setIsDragging(false);
     const slideIndex = Math.round(-translateX / 100);
     goToSlide(slideIndex);
-  };
+  }, [isDragging, translateX, goToSlide]);
 
-  const handleMouseLeave = () => {
+  const handleMouseLeave = useCallback(() => {
     if (isDragging) {
       setIsDragging(false);
       const slideIndex = Math.round(-translateX / 100);
       goToSlide(slideIndex);
     }
-  };
+  }, [isDragging, translateX, goToSlide]);
 
   const handleTouchStart = (e: React.TouchEvent) => {
     setIsDragging(true);
@@ -96,7 +119,8 @@ export const Recommendations: React.FC<RecommendationsProps> = ({
     if (!isDragging) return;
 
     let currentX = e.touches[0].clientX - startX;
-    const maxTranslate = -(totalSlides - 1) * 100;
+    const totalSlides = totalSlidesRef.current;
+    const maxTranslate = totalSlides > 0 ? -(totalSlides - 1) * 100 : 0;
 
     if (currentX > 0) currentX = 0;
     if (currentX < maxTranslate) currentX = maxTranslate;
@@ -104,21 +128,31 @@ export const Recommendations: React.FC<RecommendationsProps> = ({
     setTranslateX(currentX);
   };
 
-  const handleTouchEnd = () => {
+  const handleTouchEnd = useCallback(() => {
     if (!isDragging) return;
 
     setIsDragging(false);
     const slideIndex = Math.round(-translateX / 100);
     goToSlide(slideIndex);
-  };
+  }, [isDragging, translateX, goToSlide]);
 
   // Обработчик клика на карточку
   const handleCardClick = (scholarship: Scholarship, e: React.MouseEvent) => {
-    e.stopPropagation(); // Предотвращаем всплытие события
+    e.stopPropagation();
     onCardClick?.(scholarship);
   };
 
-  if (visibleScholarships.length === 0) return null;
+  // Если нет рекомендаций, не рендерим компонент
+  if (visibleScholarships.length === 0) {
+    return (
+      <div className={styles.recommendationsContainer}>
+        <h2 className={styles.title}>Рекомендации</h2>
+        <div className={styles.noRecommendations}>
+          <p>Нет доступных рекомендаций</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.recommendationsContainer}>

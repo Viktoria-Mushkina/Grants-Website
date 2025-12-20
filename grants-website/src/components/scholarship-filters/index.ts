@@ -1,0 +1,1 @@
+export {ScholarshipFilters} from './scholarship-filters'
