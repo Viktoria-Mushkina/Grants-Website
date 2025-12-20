@@ -13,25 +13,25 @@ const selectedScholarshipIds = [4, 7, 8, 10, 11, 12, 13, 14, 16];
 function App() {
   const [filteredScholarships, setFilteredScholarships] =
     useState<Scholarship[]>(scholarshipsData);
-  const [searchActive, setSearchActive] = useState(false);
   const [selectedScholarship, setSelectedScholarship] =
     useState<Scholarship | null>(null);
 
-  // Обработчик выбора стипендии из поиска
   const handleSelectScholarship = (scholarship: Scholarship) => {
-    setFilteredScholarships([scholarship]);
-    setSearchActive(true);
+    setSelectedScholarship(scholarship);
   };
 
-  // Обработчик клика на стипендию в таблице
   const handleScholarshipClick = (scholarship: Scholarship) => {
     setSelectedScholarship(scholarship);
   };
 
-  // Обработчик закрытия детальной информации
+  const handleRecommendationCardClick = (scholarship: Scholarship) => {
+    setSelectedScholarship(scholarship);
+  };
+
   const handleCloseDetails = () => {
     setSelectedScholarship(null);
   };
+
   const selectedScholarships = scholarshipsData.filter((scholarship) =>
     selectedScholarshipIds.includes(scholarship.id)
   );
@@ -42,32 +42,26 @@ function App() {
         <img src={bgImage} alt="background" />
       </div>
       <main className="app-main">
-        <Recommendations scholarships={selectedScholarships} />
+        <Recommendations
+          scholarships={selectedScholarships}
+          onCardClick={handleRecommendationCardClick}
+        />
 
         <ScholarshipSearch
           scholarships={scholarshipsData}
           onSelect={handleSelectScholarship}
         />
 
-        {selectedScholarship ? (
+        {selectedScholarship && (
           <ScholarshipDetailsModal
             scholarship={selectedScholarship}
             onClose={handleCloseDetails}
           />
-        ) : (
-          <>
-            {searchActive && (
-              <div className="search-results-header">
-                <h3>Результаты поиска</h3>
-              </div>
-            )}
-
-            <ScholarshipTable
-              scholarships={filteredScholarships}
-              onRowClick={handleScholarshipClick}
-            />
-          </>
         )}
+        <ScholarshipTable
+          scholarships={filteredScholarships}
+          onRowClick={handleScholarshipClick}
+        />
       </main>
     </div>
   );

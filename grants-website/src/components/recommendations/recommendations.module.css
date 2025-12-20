@@ -54,6 +54,7 @@
   color: white;
   height: 261px;
   justify-content: space-between;
+  cursor: pointer;
 }
 
 .scholarshipName {

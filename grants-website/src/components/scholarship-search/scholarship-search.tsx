@@ -31,7 +31,13 @@ export const ScholarshipSearch: React.FC<ScholarshipSearchProps> = ({
 
     const term = searchTerm.toLowerCase();
     const filtered = scholarships
-      .filter((scholarship) => scholarship.name.toLowerCase().includes(term))
+      .filter(
+        (scholarship) =>
+          scholarship.name.toLowerCase().includes(term) ||
+          scholarship.description?.toLowerCase().includes(term) ||
+          scholarship.target.toLowerCase().includes(term) ||
+          scholarship.conditions.toLowerCase().includes(term)
+      )
       .slice(0, 5);
 
     setFilteredScholarships(filtered);
@@ -46,7 +52,6 @@ export const ScholarshipSearch: React.FC<ScholarshipSearchProps> = ({
 
   // Обработчик выбора стипендии
   const handleSelectScholarship = (scholarship: Scholarship) => {
-    setSearchTerm(scholarship.name);
     setIsDropdownOpen(false);
     onSelect?.(scholarship);
     inputRef.current?.blur();
@@ -77,11 +82,11 @@ export const ScholarshipSearch: React.FC<ScholarshipSearchProps> = ({
         break;
       case "Escape":
         setIsDropdownOpen(false);
+        setSearchTerm("");
         break;
     }
   };
 
-  // Клик вне компонента закрывает dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (

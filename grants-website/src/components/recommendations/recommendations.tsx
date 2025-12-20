@@ -4,7 +4,9 @@ import styles from "./recommendations.module.css";
 
 interface RecommendationsProps {
   scholarships: Scholarship[];
+  onCardClick?: (scholarship: Scholarship) => void;
 }
+
 const truncateText = (text: string, maxLength: number = 50): string => {
   if (!text) return "";
   const trimmedText = text.trim();
@@ -14,8 +16,10 @@ const truncateText = (text: string, maxLength: number = 50): string => {
 
   return trimmedText.slice(0, maxLength).trim() + "...";
 };
+
 export const Recommendations: React.FC<RecommendationsProps> = ({
   scholarships,
+  onCardClick,
 }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -108,6 +112,12 @@ export const Recommendations: React.FC<RecommendationsProps> = ({
     goToSlide(slideIndex);
   };
 
+  // Обработчик клика на карточку
+  const handleCardClick = (scholarship: Scholarship, e: React.MouseEvent) => {
+    e.stopPropagation(); // Предотвращаем всплытие события
+    onCardClick?.(scholarship);
+  };
+
   if (visibleScholarships.length === 0) return null;
 
   return (
@@ -143,7 +153,11 @@ export const Recommendations: React.FC<RecommendationsProps> = ({
             >
               <div className={styles.cardsContainer}>
                 {slide.map((scholarship) => (
-                  <div key={scholarship.id} className={styles.card}>
+                  <div
+                    key={scholarship.id}
+                    className={styles.card}
+                    onClick={(e) => handleCardClick(scholarship, e)}
+                  >
                     <h3 className={styles.scholarshipName}>
                       {scholarship.name}
                     </h3>

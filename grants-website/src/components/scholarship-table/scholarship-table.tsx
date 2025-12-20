@@ -20,17 +20,7 @@ export const ScholarshipTable: React.FC<ScholarshipTableProps> = ({
             onClick={() => onRowClick(scholarship)}
           >
             <div className={styles.cell}>{scholarship.name}</div>
-            <div className={styles.cell}>
-              <span
-                className={`${styles.typeBadge} ${
-                  scholarship.type === "Государственная"
-                    ? styles.state
-                    : styles.nonState
-                }`}
-              >
-                {scholarship.type}
-              </span>
-            </div>
+            <div className={styles.cell}>{scholarship.type}</div>
           </div>
         ))}
       </div>
