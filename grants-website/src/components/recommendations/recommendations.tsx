@@ -49,6 +49,21 @@ export const Recommendations: React.FC<RecommendationsProps> = ({
     setTranslateX(-index * 100);
   }, []);
 
+  // Функция для обновления текущего слайда
+  const updateCurrentSlide = useCallback(() => {
+    const totalSlides = totalSlidesRef.current;
+    if (totalSlides === 0) return;
+
+    const slideWidth = 100;
+    const currentPosition = -translateX;
+    const slideIndex = Math.max(
+      0,
+      Math.min(totalSlides - 1, Math.round(currentPosition / slideWidth))
+    );
+
+    setCurrentSlide(slideIndex);
+  }, [translateX]);
+
   // Оптимизированный useEffect с проверкой на реальные изменения
   useEffect(() => {
     // Проверяем, действительно ли данные изменились
@@ -92,6 +107,13 @@ export const Recommendations: React.FC<RecommendationsProps> = ({
     if (currentX < maxTranslate) currentX = maxTranslate;
 
     setTranslateX(currentX);
+
+    // Обновляем текущий слайд во время движения
+    const slideIndex = Math.round(-currentX / 100);
+    const boundedIndex = Math.max(0, Math.min(totalSlides - 1, slideIndex));
+    if (boundedIndex !== currentSlide) {
+      setCurrentSlide(boundedIndex);
+    }
   };
 
   const handleMouseUp = useCallback(() => {
@@ -111,14 +133,16 @@ export const Recommendations: React.FC<RecommendationsProps> = ({
   }, [isDragging, translateX, goToSlide]);
 
   const handleTouchStart = (e: React.TouchEvent) => {
+    const touch = e.touches[0];
     setIsDragging(true);
-    setStartX(e.touches[0].clientX - translateX);
+    setStartX(touch.clientX - translateX);
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging) return;
+    if (!isDragging || !e.touches[0]) return;
 
-    let currentX = e.touches[0].clientX - startX;
+    const touch = e.touches[0];
+    let currentX = touch.clientX - startX;
     const totalSlides = totalSlidesRef.current;
     const maxTranslate = totalSlides > 0 ? -(totalSlides - 1) * 100 : 0;
 
@@ -126,6 +150,13 @@ export const Recommendations: React.FC<RecommendationsProps> = ({
     if (currentX < maxTranslate) currentX = maxTranslate;
 
     setTranslateX(currentX);
+
+    // Обновляем текущий слайд во время движения
+    const slideIndex = Math.round(-currentX / 100);
+    const boundedIndex = Math.max(0, Math.min(totalSlides - 1, slideIndex));
+    if (boundedIndex !== currentSlide) {
+      setCurrentSlide(boundedIndex);
+    }
   };
 
   const handleTouchEnd = useCallback(() => {
