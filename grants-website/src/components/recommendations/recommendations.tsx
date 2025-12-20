@@ -5,7 +5,15 @@ import styles from "./recommendations.module.css";
 interface RecommendationsProps {
   scholarships: Scholarship[];
 }
+const truncateText = (text: string, maxLength: number = 50): string => {
+  if (!text) return "";
+  const trimmedText = text.trim();
+  if (trimmedText.length <= maxLength) {
+    return trimmedText;
+  }
 
+  return trimmedText.slice(0, maxLength).trim() + "...";
+};
 export const Recommendations: React.FC<RecommendationsProps> = ({
   scholarships,
 }) => {
@@ -21,6 +29,7 @@ export const Recommendations: React.FC<RecommendationsProps> = ({
     Scholarship[][]
   >([]);
   const totalSlides = visibleScholarships.length;
+
   useEffect(() => {
     const slides: Scholarship[][] = [];
     for (let i = 0; i < scholarships.length; i += 3) {
@@ -138,18 +147,16 @@ export const Recommendations: React.FC<RecommendationsProps> = ({
                     <h3 className={styles.scholarshipName}>
                       {scholarship.name}
                     </h3>
-
-                    <div className={styles.target}>
-                      <p className={styles.targetText}>
-                        {scholarship.shortTarget || scholarship.target}
-                      </p>
-                    </div>
-
-                    {scholarship.amount && (
-                      <div className={styles.amount}>
-                        <div className={styles.amountValue}>
-                          {scholarship.amount}
-                        </div>
+                    {scholarship.description && (
+                      <div className={styles.description}>
+                        <p className={styles.descriptionText}>
+                          {truncateText(scholarship.description, 80)}
+                        </p>
+                      </div>
+                    )}
+                    {scholarship.paymentAmount && (
+                      <div className={styles.amountValue}>
+                        {scholarship.paymentAmount}
                       </div>
                     )}
                   </div>

@@ -14,7 +14,7 @@
   overflow-x: auto;
   cursor: grab;
   scroll-behavior: smooth;
-  scroll-snap-type: x mandatory; /* Привязка к слайдам */
+  scroll-snap-type: x mandatory;
 }
 
 .carouselContainer::-webkit-scrollbar {
@@ -61,7 +61,7 @@
   line-height: 26px;
 }
 
-.targetText {
+p {
   color: rgba(255, 255, 255, 0.6);
 }
 
@@ -90,12 +90,14 @@
   background: rgba(255, 255, 255, 1);
 }
 
-/* Плавная анимация для карточек */
 .card {
   animation: slideIn 0.5s ease-out forwards;
   animation-delay: calc(var(--card-index, 0) * 0.1s);
 }
-
+.amountValue {
+  text-align: right;
+  font-weight: 600;
+}
 @keyframes slideIn {
   from {
     opacity: 0;

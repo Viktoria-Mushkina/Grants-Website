@@ -8,7 +8,7 @@ import { useState } from "react";
 import bgImage from "/bg-image.png";
 import "./App.css";
 
-const recommendedScholarships = scholarshipsData.slice(0, 9);
+const selectedScholarshipIds = [4, 7, 8, 10, 11, 12, 13, 14, 16];
 
 function App() {
   const [filteredScholarships, setFilteredScholarships] =
@@ -32,6 +32,9 @@ function App() {
   const handleCloseDetails = () => {
     setSelectedScholarship(null);
   };
+  const selectedScholarships = scholarshipsData.filter((scholarship) =>
+    selectedScholarshipIds.includes(scholarship.id)
+  );
 
   return (
     <div className="app">
@@ -39,7 +42,7 @@ function App() {
         <img src={bgImage} alt="background" />
       </div>
       <main className="app-main">
-        <Recommendations scholarships={recommendedScholarships} />
+        <Recommendations scholarships={selectedScholarships} />
 
         <ScholarshipSearch
           scholarships={scholarshipsData}
