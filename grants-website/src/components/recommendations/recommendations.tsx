@@ -17,6 +17,74 @@ const truncateText = (text: string, maxLength: number = 50): string => {
   return trimmedText.slice(0, maxLength).trim() + "...";
 };
 
+// Функция для форматирования суммы выплаты
+const formatPaymentAmount = (scholarship: Scholarship): string => {
+  const amount = scholarship.paymentAmount;
+  const frequency = scholarship.paymentFrequency;
+
+  if (!amount) return "Не указано";
+
+  let formattedAmount = "";
+
+  // Обработка числовых значений
+  if (typeof amount === "number") {
+    formattedAmount = `₽ ${amount.toLocaleString("ru-RU")}`;
+  }
+  // Обработка строковых значений
+  else if (typeof amount === "string") {
+    // Если строка уже содержит знак рубля
+    if (amount.includes("₽")) {
+      formattedAmount = amount;
+    }
+    // Если это числовая строка (содержит цифры)
+    else if (amount.match(/\d/)) {
+      // Пытаемся извлечь число для форматирования
+      const numMatch = amount.match(/(\d[\d\s]*)/);
+      if (numMatch) {
+        const numStr = numMatch[0].replace(/\s/g, "");
+        const num = parseInt(numStr, 10);
+        if (!isNaN(num)) {
+          // Сохраняем оригинальный формат, если это диапазон
+          if (
+            amount.includes("-") ||
+            amount.includes("–") ||
+            amount.includes("—")
+          ) {
+            formattedAmount = `₽ ${amount}`;
+          } else {
+            formattedAmount = `₽ ${num.toLocaleString("ru-RU")}`;
+          }
+        } else {
+          formattedAmount = `₽ ${amount}`;
+        }
+      } else {
+        formattedAmount = `₽ ${amount}`;
+      }
+    }
+    // Если это не числовая строка
+    else {
+      formattedAmount = amount;
+    }
+  }
+
+  // Добавляем частоту выплат если есть
+  if (frequency && formattedAmount) {
+    const frequencyLabel =
+      frequency === "Ежемесячная"
+        ? "месяц"
+        : frequency === "Единоразовая"
+        ? "единожды"
+        : frequency === "За семестр"
+        ? "семестр"
+        : frequency === "За год"
+        ? "год"
+        : frequency;
+    return `${formattedAmount} / ${frequencyLabel}`;
+  }
+
+  return formattedAmount || "Не указано";
+};
+
 export const Recommendations: React.FC<RecommendationsProps> = ({
   scholarships,
   onCardClick,
@@ -48,6 +116,7 @@ export const Recommendations: React.FC<RecommendationsProps> = ({
     setCurrentSlide(index);
     setTranslateX(-index * 100);
   }, []);
+
   // Оптимизированный useEffect с проверкой на реальные изменения
   useEffect(() => {
     // Проверяем, действительно ли данные изменились
@@ -217,11 +286,9 @@ export const Recommendations: React.FC<RecommendationsProps> = ({
                         </p>
                       </div>
                     )}
-                    {scholarship.paymentAmount && (
-                      <div className={styles.amountValue}>
-                        {scholarship.paymentAmount}
-                      </div>
-                    )}
+                    <div className={styles.amountValue}>
+                      {formatPaymentAmount(scholarship)}
+                    </div>
                   </div>
                 ))}
               </div>

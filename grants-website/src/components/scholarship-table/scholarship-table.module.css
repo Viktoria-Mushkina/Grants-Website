@@ -15,6 +15,7 @@
 
 .tableContainer::-webkit-scrollbar-track {
   background: transparent;
+  margin: 40px 0;
 }
 
 .tableContainer::-webkit-scrollbar-thumb {

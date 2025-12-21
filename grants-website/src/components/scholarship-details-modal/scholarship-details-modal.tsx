@@ -17,6 +17,88 @@ export const ScholarshipDetailsModal: React.FC<
       document.body.classList.remove("modal-open");
     };
   }, []);
+  // Функция для форматирования суммы выплаты
+  const formatPaymentAmount = (scholarship: Scholarship): string => {
+    const amount = scholarship.paymentAmount;
+    const frequency = scholarship.paymentFrequency;
+
+    if (!amount) return "Не указано";
+
+    // Если сумма - число
+    if (typeof amount === "number") {
+      // Форматируем число с пробелами для тысяч
+      const formattedAmount = amount.toLocaleString("ru-RU");
+
+      if (frequency) {
+        return `₽ ${formattedAmount} / ${getFrequencyLabel(frequency)}`;
+      }
+      return `₽ ${formattedAmount}`;
+    }
+
+    // Если сумма - строка
+    if (typeof amount === "string") {
+      // Проверяем, содержит ли строка уже знак рубля
+      if (amount.includes("₽")) {
+        // Если уже есть знак рубля, добавляем частоту выплат если нужно
+        if (frequency) {
+          return `${amount} / ${getFrequencyLabel(frequency)}`;
+        }
+        return amount;
+      }
+
+      // Проверяем, является ли строка числом
+      const numMatch = amount.match(/(\d+)/);
+      if (numMatch) {
+        const num = parseInt(numMatch[0].replace(/\s/g, ""));
+        const formattedAmount = num.toLocaleString("ru-RU");
+
+        if (frequency) {
+          return `₽ ${formattedAmount} / ${getFrequencyLabel(frequency)}`;
+        }
+        return `₽ ${formattedAmount}`;
+      }
+
+      // Если это диапазон (например, "25000-40000")
+      const rangeMatch = amount.match(/(\d+)[-\s]+(\d+)/);
+      if (rangeMatch) {
+        const startNum = parseInt(rangeMatch[1]);
+        const endNum = parseInt(rangeMatch[2]);
+        const formattedStart = startNum.toLocaleString("ru-RU");
+        const formattedEnd = endNum.toLocaleString("ru-RU");
+
+        if (frequency) {
+          return `₽ ${formattedStart}-${formattedEnd} / ${getFrequencyLabel(
+            frequency
+          )}`;
+        }
+        return `₽ ${formattedStart}-${formattedEnd}`;
+      }
+
+      // Если это просто текст
+      if (frequency) {
+        return amount;
+      }
+      return amount;
+    }
+
+    return "Не указано";
+  };
+
+  // Функция для получения читаемой метки периодичности
+  const getFrequencyLabel = (frequency: string): string => {
+    switch (frequency) {
+      case "Ежемесячная":
+        return "месяц";
+      case "Единоразовая":
+        return "единожды";
+      case "За семестр":
+        return "семестр";
+      case "За год":
+        return "год";
+      default:
+        return frequency;
+    }
+  };
   return (
     <div className={styles.overlay}>
       <div className={styles.container}>
@@ -38,7 +120,7 @@ export const ScholarshipDetailsModal: React.FC<
                 </p>
               </div>
               <strong className={styles.paymentAmount}>
-                {scholarship.paymentAmount || "Не указано"}
+                {formatPaymentAmount(scholarship)}
               </strong>
             </div>
 

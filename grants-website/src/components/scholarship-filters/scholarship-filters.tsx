@@ -42,18 +42,9 @@ export const ScholarshipFilters: React.FC<ExpandingFilterProps> = ({
 
   // Опции для фильтров
   const filterOptions = {
-    scholarshipType: [
-      "Государственная",
-      "Негосударственная (именная)",
-      "Президентская / Правительственная",
-      "Корпоративная",
-      "Социальная",
-      "Материальная помощь",
-      "Программы поддержки / льготы",
-    ],
+    scholarshipType: ["Государственная", "Негосударственная"],
 
     educationLevel: [
-      "Абитуриент",
       "Бакалавриат",
       "Специалитет",
       "Магистратура",
@@ -74,7 +65,19 @@ export const ScholarshipFilters: React.FC<ExpandingFilterProps> = ({
       "Для всех институтов",
     ],
 
-    course: ["1", "2", "3", "4", "5", "6"],
+    course: [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "Магистратура 1",
+      "Магистратура 2",
+      "Любой курс",
+      "Любой курс магистратуры",
+      "Любой курс аспирантуры",
+    ],
 
     achievements: [
       "Учебные",
@@ -96,7 +99,7 @@ export const ScholarshipFilters: React.FC<ExpandingFilterProps> = ({
       "5 000 – 10 000 ₽",
       "10 000 – 20 000 ₽",
       "20 000 – 30 000 ₽",
-      "30 000 ₽",
+      "Более 30 000 ₽",
     ],
 
     paymentFrequency: ["Ежемесячная", "Единоразовая", "За семестр", "За год"],
@@ -148,7 +151,59 @@ export const ScholarshipFilters: React.FC<ExpandingFilterProps> = ({
     }
   };
 
-  // Функция фильтрации с проверкой изменений
+  // Функция для преобразования paymentAmount в число
+  const getPaymentAmountNumber = (
+    amount: string | number | undefined
+  ): number | null => {
+    if (amount === undefined || amount === null) return null;
+
+    if (typeof amount === "number") {
+      return amount;
+    }
+
+    if (typeof amount === "string") {
+      // Извлекаем первое число из строки
+      const match = amount.match(/(\d+[\s\d]*)/);
+      if (match) {
+        // Убираем пробелы и преобразуем в число
+        const numStr = match[1].replace(/\s/g, "");
+        return parseInt(numStr, 10);
+      }
+
+      // Если есть диапазон (например, "25000-40000")
+      const rangeMatch = amount.match(/(\d+)[-\s]+(\d+)/);
+      if (rangeMatch) {
+        return parseInt(rangeMatch[1], 10); // Берем нижнюю границу
+      }
+    }
+
+    return null;
+  };
+
+  // Функция для проверки совпадения суммы
+  const checkPaymentAmountRange = (
+    amount: number | null,
+    range: string
+  ): boolean => {
+    if (amount === null) return false;
+
+    switch (range) {
+      case "До 5 000 ₽":
+        return amount < 5000;
+      case "5 000 – 10 000 ₽":
+        return amount >= 5000 && amount <= 10000;
+      case "10 000 – 20 000 ₽":
+        return amount >= 10000 && amount <= 20000;
+      case "20 000 – 30 000 ₽":
+        return amount >= 20000 && amount <= 30000;
+      case "Более 30 000 ₽":
+        return amount > 30000;
+      default:
+        return false;
+    }
+  };
+
+  // Функция фильтрации
   const applyFilters = useCallback(() => {
     if (!isExpanded) return;
 
@@ -182,124 +237,120 @@ export const ScholarshipFilters: React.FC<ExpandingFilterProps> = ({
 
     let filtered = [...scholarships];
 
+    // Фильтр по типу стипендии
     if (scholarshipType.length > 0) {
-      filtered = filtered.filter((scholarship) => {
-        const type = scholarship.type || "";
-        return scholarshipType.some((filterType) => {
-          if (filterType === "Государственная")
-            return type === "Государственная";
-          if (filterType === "Негосударственная (именная)")
-            return type === "Негосударственная";
-          if (filterType === "Президентская / Правительственная") {
-            return (
-              scholarship.category?.includes("Президентские") ||
-              scholarship.category?.includes("Правительственные")
-            );
-          }
-          if (filterType === "Корпоративная")
-            return scholarship.category?.includes("ЭкоТех");
-          if (filterType === "Социальная")
-            return scholarship.name.includes("социальн");
-          return false;
-        });
-      });
+      filtered = filtered.filter((scholarship) =>
+        scholarshipType.includes(scholarship.type)
+      );
     }
 
+    // Фильтр по уровню обучения
     if (educationLevel.length > 0) {
       filtered = filtered.filter((scholarship) => {
         if (!scholarship.educationLevel) return false;
         return educationLevel.some((level) =>
-          scholarship.educationLevel?.some((scholarshipLevel) =>
-            scholarshipLevel.toLowerCase().includes(level.toLowerCase())
-          )
+          scholarship.educationLevel?.includes(level)
         );
       });
     }
 
+    // Фильтр по форме обучения
     if (studyForm.length > 0) {
       filtered = filtered.filter((scholarship) => {
         if (!scholarship.studyForm) return false;
-        return studyForm.some((form) =>
-          scholarship.studyForm?.some((scholarshipForm) =>
-            scholarshipForm.toLowerCase().includes(form.toLowerCase())
-          )
-        );
+        return studyForm.some((form) => scholarship.studyForm?.includes(form));
       });
     }
 
-    if (institute.length > 0 && !institute.includes("Для всех институтов")) {
+    // Фильтр по институту
+    if (institute.length > 0) {
       filtered = filtered.filter((scholarship) => {
-        const scholarshipCategory = scholarship.category || "";
-        return institute.some((inst) => scholarshipCategory.includes(inst));
+        if (!scholarship.department) return false;
+
+        const isForAllInstitutes = scholarship.department?.includes(
+          "Для всех институтов"
+        );
+
+        if (isForAllInstitutes) {
+          return true;
+        }
+        const hasMatchingInstitute = institute.some((inst) =>
+          scholarship.department?.includes(inst)
+        );
+
+        return hasMatchingInstitute;
       });
     }
 
+    // Фильтр по курсу
     if (course.length > 0) {
       filtered = filtered.filter((scholarship) => {
         if (!scholarship.course) return false;
-        return course.some((c) => scholarship.course?.includes(c));
+
+        // Проверяем, если выбран "Любой курс" и это присутствует
+        if (course.includes("Любой курс")) {
+          return scholarship.course?.includes("Любой курс");
+        }
+
+        // Проверяем точные совпадения курсов
+        return course.some((c) =>
+          scholarship.course?.some((schCourse) => {
+            // Простое совпадение строк
+            if (schCourse === c) return true;
+
+            // Если в scholarship.course есть "Магистратура 1" или "Магистратура 2"
+            if (
+              c.startsWith("Магистратура") &&
+              schCourse.startsWith("Магистратура")
+            ) {
+              return true;
+            }
+
+            // Для числовых курсов
+            if (!isNaN(Number(c)) && !isNaN(Number(schCourse))) {
+              return Number(schCourse) === Number(c);
+            }
+
+            return false;
+          })
+        );
       });
     }
 
+    // Фильтр по типу достижений
+    if (achievements.length > 0) {
+      filtered = filtered.filter((scholarship) => {
+        const scholarshipAchievements =
+          scholarship.requirements?.achievements || [];
+        return achievements.some((achievement) =>
+          scholarshipAchievements.includes(achievement)
+        );
+      });
+    }
+
+    // Фильтр по размеру выплаты
     if (paymentAmount.length > 0) {
       filtered = filtered.filter((scholarship) => {
-        const amount = scholarship.paymentAmount || "";
-        return paymentAmount.some((range) => {
-          if (range === "До 5 000 ₽") {
-            const match = amount.match(/(\d+)/);
-            if (match) {
-              const num = parseInt(match[1].replace(/\s/g, ""));
-              return num < 5000;
-            }
-          }
-          if (range === "5 000 – 10 000 ₽") {
-            const match = amount.match(/(\d+)/);
-            if (match) {
-              const num = parseInt(match[1].replace(/\s/g, ""));
-              return num >= 5000 && num <= 10000;
-            }
-          }
-          if (range === "10 000 – 20 000 ₽") {
-            const match = amount.match(/(\d+)/);
-            if (match) {
-              const num = parseInt(match[1].replace(/\s/g, ""));
-              return num >= 10000 && num <= 20000;
-            }
-          }
-          if (range === "20 000 – 30 000 ₽") {
-            const match = amount.match(/(\d+)/);
-            if (match) {
-              const num = parseInt(match[1].replace(/\s/g, ""));
-              return num >= 20000 && num <= 30000;
-            }
-          }
-          if (range === "30 000 ₽") {
-            const match = amount.match(/(\d+)/);
-            if (match) {
-              const num = parseInt(match[1].replace(/\s/g, ""));
-              return num >= 30000;
-            }
-          }
-          return false;
-        });
+        const amount = getPaymentAmountNumber(scholarship.paymentAmount);
+        return paymentAmount.some((range) =>
+          checkPaymentAmountRange(amount, range)
+        );
       });
     }
 
+    // Фильтр по периодичности
     if (paymentFrequency.length > 0) {
       filtered = filtered.filter((scholarship) => {
-        const frequency = scholarship.paymentFrequency || "";
-        return paymentFrequency.some((freq) =>
-          frequency.toLowerCase().includes(freq.toLowerCase())
-        );
+        if (!scholarship.paymentFrequency) return false;
+        return paymentFrequency.includes(scholarship.paymentFrequency);
       });
     }
 
+    // Фильтр по длительности
     if (paymentDuration.length > 0) {
       filtered = filtered.filter((scholarship) => {
-        const duration = scholarship.paymentDuration || "";
-        return paymentDuration.some((dur) =>
-          duration.toLowerCase().includes(dur.toLowerCase())
-        );
+        if (!scholarship.paymentDuration) return false;
+        return paymentDuration.includes(scholarship.paymentDuration);
       });
     }
 
@@ -326,19 +377,27 @@ export const ScholarshipFilters: React.FC<ExpandingFilterProps> = ({
     onFilterChange,
   ]);
 
-  // Используем setTimeout для отложенного вызова фильтрации
+  // Применяем фильтры при изменении
   useEffect(() => {
     if (!isExpanded) return;
 
     const timer = setTimeout(() => {
       applyFilters();
-    }, 50); // Небольшая задержка для предотвращения частых обновлений
+    }, 50);
 
     return () => clearTimeout(timer);
   }, [
     applyFilters,
     isExpanded,
-    // Не включаем другие зависимости - они уже в applyFilters
+    scholarshipType,
+    educationLevel,
+    studyForm,
+    institute,
+    course,
+    achievements,
+    paymentAmount,
+    paymentFrequency,
+    paymentDuration,
   ]);
 
   const clearAllFilters = () => {
@@ -562,6 +621,39 @@ export const ScholarshipFilters: React.FC<ExpandingFilterProps> = ({
               )}
             </div>
 
+            {/* Тип достижений */}
+            <div className={styles.filterSection}>
+              <div
+                className={styles.filterSectionHeader}
+                onClick={() => toggleFilter("Тип достижений")}
+              >
+                <span>Тип достижений</span>
+                <span className={styles.arrow}>
+                  {expandedFilter === "Тип достижений" ? "▼" : "▶"}
+                </span>
+              </div>
+              {expandedFilter === "Тип достижений" && (
+                <div className={styles.filterOptions}>
+                  {filterOptions.achievements.map((option) => (
+                    <label key={option} className={styles.filterOption}>
+                      <input
+                        type="checkbox"
+                        checked={achievements.includes(option)}
+                        onChange={(e) =>
+                          handleCheckboxChange(
+                            "Тип достижений",
+                            option,
+                            e.target.checked
+                          )
+                        }
+                      />
+                      <span>{option}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {/* Размер выплаты */}
             <div className={styles.filterSection}>
               <div
@@ -594,6 +686,72 @@ export const ScholarshipFilters: React.FC<ExpandingFilterProps> = ({
                 </div>
               )}
             </div>
+
+            {/* Периодичность */}
+            <div className={styles.filterSection}>
+              <div
+                className={styles.filterSectionHeader}
+                onClick={() => toggleFilter("Периодичность")}
+              >
+                <span>Периодичность</span>
+                <span className={styles.arrow}>
+                  {expandedFilter === "Периодичность" ? "▼" : "▶"}
+                </span>
+              </div>
+              {expandedFilter === "Периодичность" && (
+                <div className={styles.filterOptions}>
+                  {filterOptions.paymentFrequency.map((option) => (
+                    <label key={option} className={styles.filterOption}>
+                      <input
+                        type="checkbox"
+                        checked={paymentFrequency.includes(option)}
+                        onChange={(e) =>
+                          handleCheckboxChange(
+                            "Периодичность",
+                            option,
+                            e.target.checked
+                          )
+                        }
+                      />
+                      <span>{option}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Длительность */}
+            <div className={styles.filterSection}>
+              <div
+                className={styles.filterSectionHeader}
+                onClick={() => toggleFilter("Длительность")}
+              >
+                <span>Длительность</span>
+                <span className={styles.arrow}>
+                  {expandedFilter === "Длительность" ? "▼" : "▶"}
+                </span>
+              </div>
+              {expandedFilter === "Длительность" && (
+                <div className={styles.filterOptions}>
+                  {filterOptions.paymentDuration.map((option) => (
+                    <label key={option} className={styles.filterOption}>
+                      <input
+                        type="checkbox"
+                        checked={paymentDuration.includes(option)}
+                        onChange={(e) =>
+                          handleCheckboxChange(
+                            "Длительность",
+                            option,
+                            e.target.checked
+                          )
+                        }
+                      />
+                      <span>{option}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           <div className={styles.activeFilters}>
@@ -610,6 +768,21 @@ export const ScholarshipFilters: React.FC<ExpandingFilterProps> = ({
             {studyForm.length > 0 && (
               <span className={styles.activeFilterTag}>
                 Форма: {studyForm.length}
+              </span>
+            )}
+            {institute.length > 0 && (
+              <span className={styles.activeFilterTag}>
+                Институт: {institute.length}
+              </span>
+            )}
+            {course.length > 0 && (
+              <span className={styles.activeFilterTag}>
+                Курс: {course.length}
+              </span>
+            )}
+            {achievements.length > 0 && (
+              <span className={styles.activeFilterTag}>
+                Достижения: {achievements.length}
               </span>
             )}
           </div>

@@ -4,7 +4,7 @@ export interface Scholarship {
   target: string;
   type: "Государственная" | "Негосударственная";
   conditions: string;
-  paymentAmount?: string;
+  paymentAmount?:number | string;
   category?: string;
   description?: string;
   paymentFrequency?: string;
