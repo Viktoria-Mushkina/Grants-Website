@@ -350,7 +350,7 @@ export const scholarshipsData: Scholarship[] = [
     paymentDuration: "≤ 3 месяцев",
     educationLevel: ["Бакалавриат", "Магистратура"],
     course: ["Любой курс"],
-    department: ["ЭкоТех", "ИНМиН", "Горный институт", "ИКН", "ИФКИ", "ИЭУ", "БиоИнж", "ИБО"],
+    department: ["Для всех институтов"],
     studyForm: ["Очная", "Заочная"],
     requirements: {
       noDebts: true,

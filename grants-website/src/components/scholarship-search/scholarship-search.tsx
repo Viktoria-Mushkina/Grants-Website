@@ -20,6 +20,7 @@ export const ScholarshipSearch: React.FC<ScholarshipSearchProps> = ({
   >([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [isFiltersExpanded, setIsFiltersExpanded] = useState(false);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -91,6 +92,16 @@ export const ScholarshipSearch: React.FC<ScholarshipSearchProps> = ({
     onFilterChange?.(filtered);
   };
 
+  // Функция для получения состояния фильтров
+  const handleFilterExpand = (expanded: boolean) => {
+    setIsFiltersExpanded(expanded);
+  };
+
+  // Функция для закрытия результатов поиска
+  const handleSearchResultsClose = () => {
+    setIsDropdownOpen(false);
+  };
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -106,7 +117,11 @@ export const ScholarshipSearch: React.FC<ScholarshipSearchProps> = ({
 
   return (
     <div className={styles.searchContainer} ref={dropdownRef}>
-      <div className={styles.searchSection}>
+      <div
+        className={`${styles.searchSection} ${
+          isFiltersExpanded ? styles.filtersExpanded : ""
+        }`}
+      >
         <input
           ref={inputRef}
           type="text"
@@ -152,10 +167,14 @@ export const ScholarshipSearch: React.FC<ScholarshipSearchProps> = ({
         )}
       </div>
 
-      <ScholarshipFilters
-        scholarships={scholarships}
-        onFilterChange={handleFilterChange}
-      />
+      <div className={styles.filtersWrapper}>
+        <ScholarshipFilters
+          scholarships={scholarships}
+          onFilterChange={handleFilterChange}
+          onExpandChange={handleFilterExpand}
+          onSearchResultsClose={handleSearchResultsClose}
+        />
+      </div>
     </div>
   );
 };

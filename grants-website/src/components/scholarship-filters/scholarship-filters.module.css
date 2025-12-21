@@ -1,7 +1,6 @@
 .filterContainer {
   position: relative;
   display: flex;
-  align-items: flex-start;
   transition: all 0.3s ease;
 }
 
@@ -13,7 +12,8 @@
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
-
+  background: transparent;
+  border: none;
   height: 60px;
   width: 60px;
   border: 1px solid rgba(6, 173, 247, 0.32);
@@ -47,140 +47,160 @@
   opacity: 0;
 }
 
-/* Контент фильтров (появляется слева) */
+/* Контент фильтров */
 .filterContent {
   position: absolute;
   top: 0;
-  right: 60px; /* Справа от кнопки */
-  background: rgba(1, 38, 53, 0.95);
-  border-radius: 11px;
-  border: 1px solid rgba(6, 173, 247, 0.32);
-  padding: 20px;
-  width: 350px;
-  min-height: 50px;
+  right: 70px;
+  background-color: rgba(1, 38, 53, 0.2);
   backdrop-filter: blur(10px);
-  box-shadow: -5px 0 20px rgba(0, 0, 0, 0.3);
+  border-radius: 30px;
+  border: 1px solid rgba(6, 173, 247, 0.32);
+  width: 320px;
+  min-height: 50px;
   animation: slideFromRight 0.3s ease-out;
   z-index: 5;
-  max-height: 500px;
+  max-height: 300px;
   overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 .filterHeader {
+  padding: 20px 15px 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.filterHeader h3 {
-  margin: 0;
-  color: white;
-  font-size: 18px;
+  box-sizing: border-box;
 }
 
 .clearButton {
-  background: rgba(6, 173, 247, 0.2);
-  border: 1px solid rgba(6, 173, 247, 0.32);
-  color: white;
+  border: 1px solid rgba(6, 173, 247, 0.2);
+  background-color: rgba(1, 38, 53);
   padding: 6px 12px;
   border-radius: 15px;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 15px;
   transition: all 0.3s ease;
 }
 
 .clearButton:hover {
-  background: rgba(6, 173, 247, 0.4);
+  background: #0591cf;
 }
 
-/* Список фильтров */
 .filtersList {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-bottom: 15px;
 }
 
 .filterSection {
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  padding: 10px;
+  padding: 10px 0;
+  padding-left: 15px;
   transition: all 0.3s ease;
+  border-bottom: 1px solid rgba(6, 173, 247, 0.08);
+}
+
+.filterSection:last-child {
+  border-bottom: none;
 }
 
 .filterSection:hover {
-  background: rgba(0, 0, 0, 0.15);
+  background: rgba(6, 173, 247, 0.05);
+  border-left: 2px solid rgba(6, 173, 247, 0.32);
 }
 
 .filterSectionHeader {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 10px;
+  font-size: 16px;
   cursor: pointer;
-  padding: 5px 0;
-  font-weight: 600;
   color: white;
-  font-size: 14px;
+  padding: 5px 0;
 }
 
-.arrow {
+.filterArrow {
+  width: 12px;
+  height: 12px;
   transition: transform 0.3s ease;
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 12px;
 }
 
 .filterOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  max-height: 200px;
-  overflow-y: auto;
+  overflow: hidden;
+  cursor: pointer;
 }
 
 .filterOption {
   display: flex;
   align-items: center;
   gap: 10px;
-  cursor: pointer;
-  padding: 6px 0;
-  border-radius: 5px;
-  transition: background-color 0.2s;
-}
-
-.filterOption:hover {
-  background-color: rgba(255, 255, 255, 0.05);
-}
-
-.filterOption input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
+  margin-left: 22px;
 }
 
 .filterOption span {
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 13px;
-  flex: 1;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 16px;
+  overflow: hidden;
+  max-width: calc(100% - 30px);
 }
 
-.activeFilters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding-top: 15px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+.customCheckbox {
+  position: relative;
+  width: 20px;
+  height: 20px;
 }
 
-.activeFilterTag {
-  background: rgba(6, 173, 247, 0.3);
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 12px;
-  border: 1px solid rgba(6, 173, 247, 0.2);
-  color: white;
+.checkboxIcon {
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  display: block;
+}
+
+.hiddenCheckbox {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  z-index: 1;
+}
+/* В scholarship-filters.module.css добавь: */
+
+/* Стили для текста в зависимости от состояния чекбокса */
+.uncheckedText {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 16px;
+  transition: color 0.2s ease;
+}
+
+.checkedText {
+  color: rgba(255, 255, 255) !important;
+  font-size: 16px;
+  transition: color 0.2s ease;
+}
+
+.filterOption span {
+  font-size: 16px;
+  transition: color 0.2s ease;
+}
+
+.filterContent::-webkit-scrollbar {
+  width: 3px;
+}
+
+.filterContent::-webkit-scrollbar-track {
+  margin: 30px 0;
+}
+
+.filterContent::-webkit-scrollbar-thumb {
+  background: rgb(255, 255, 255);
 }
 
 /* Анимации */
@@ -229,5 +249,9 @@
 
   .clearButton {
     width: 100%;
+  }
+
+  .filterOption span {
+    font-size: 13px;
   }
 }

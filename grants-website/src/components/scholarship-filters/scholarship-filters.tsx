@@ -2,15 +2,23 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import type { Scholarship } from "../../types/scholarship";
 import styles from "./scholarship-filters.module.css";
 import filterIcon from "/filter-icon.svg";
+import openIcon from "/open.svg";
+import closeIcon from "/close.svg";
+import notChecked from "/notChecked.svg";
+import checked from "/checked.svg";
 
 interface ExpandingFilterProps {
   scholarships: Scholarship[];
   onFilterChange: (filtered: Scholarship[]) => void;
+  onExpandChange?: (expanded: boolean) => void;
+  onSearchResultsClose?: () => void;
 }
 
 export const ScholarshipFilters: React.FC<ExpandingFilterProps> = ({
   scholarships,
   onFilterChange,
+  onExpandChange,
+  onSearchResultsClose,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [expandedFilter, setExpandedFilter] = useState<string | null>(null);
@@ -42,108 +50,115 @@ export const ScholarshipFilters: React.FC<ExpandingFilterProps> = ({
 
   // Опции для фильтров
   const filterOptions = {
-    scholarshipType: ["Государственная", "Негосударственная"],
-
-    educationLevel: [
-      "Бакалавриат",
-      "Специалитет",
-      "Магистратура",
-      "Аспирантура",
-    ],
-
-    studyForm: ["Очная", "Очно-заочная", "Заочная"],
-
-    institute: [
-      "ИКН",
-      "ИНМиН",
-      "Горный институт",
-      "ИФКИ",
-      "ИЭУ",
-      "БиоИнж",
-      "ИБО",
-      "ЭкоТех",
-      "Для всех институтов",
-    ],
-
-    course: [
-      "1",
-      "2",
-      "3",
-      "4",
-      "5",
-      "6",
-      "Магистратура 1",
-      "Магистратура 2",
-      "Любой курс",
-      "Любой курс магистратуры",
-      "Любой курс аспирантуры",
-    ],
-
-    achievements: [
-      "Учебные",
-      "Научные",
-      "Проектные",
-      "Общественная деятельность",
-      "Волонтерство",
-      "Спортивные",
-      "Олимпиады",
-      "Публикации",
-      "Патенты",
-      "Гранты",
-      "Амбассадорство",
-      "Цифровое волонтерство",
-    ],
-
-    paymentAmount: [
-      "До 5 000 ₽",
-      "5 000 – 10 000 ₽",
-      "10 000 – 20 000 ₽",
-      "20 000 – 30 000 ₽",
-      "Более 30 000 ₽",
-    ],
-
-    paymentFrequency: ["Ежемесячная", "Единоразовая", "За семестр", "За год"],
-
-    paymentDuration: [
-      "≤ 3 месяцев",
-      "6 месяцев",
-      "10 месяцев",
-      "12 месяцев",
-      "Зависит от решения комиссии",
-    ],
+    "Тип стипендии": {
+      values: ["Государственная", "Негосударственная"],
+      state: scholarshipType,
+      setter: setScholarshipType,
+    },
+    "Уровень обучения": {
+      values: ["Бакалавриат", "Специалитет", "Магистратура", "Аспирантура"],
+      state: educationLevel,
+      setter: setEducationLevel,
+    },
+    "Форма обучения": {
+      values: ["Очная", "Очно-заочная", "Заочная"],
+      state: studyForm,
+      setter: setStudyForm,
+    },
+    "Институт / подразделение": {
+      values: [
+        "ИКН",
+        "ИНМиН",
+        "Горный институт",
+        "ИФКИ",
+        "ИЭУ",
+        "БиоИнж",
+        "ИБО",
+        "ЭкоТех",
+        "Для всех институтов",
+      ],
+      state: institute,
+      setter: setInstitute,
+    },
+    Курс: {
+      values: ["1", "2", "3", "4", "5", "6", "Любой курс"],
+      state: course,
+      setter: setCourse,
+    },
+    "Тип достижений": {
+      values: [
+        "Учебные",
+        "Научные",
+        "Проектные",
+        "Общественная деятельность",
+        "Волонтерство",
+        "Спортивные",
+        "Олимпиады",
+        "Публикации",
+        "Патенты",
+        "Гранты",
+        "Амбассадорство",
+        "Цифровое волонтерство",
+      ],
+      state: achievements,
+      setter: setAchievements,
+    },
+    "Размер выплаты": {
+      values: [
+        "До 5 000 ₽",
+        "5 000 – 10 000 ₽",
+        "10 000 – 20 000 ₽",
+        "20 000 – 30 000 ₽",
+        "Более 30 000 ₽",
+      ],
+      state: paymentAmount,
+      setter: setPaymentAmount,
+    },
+    Периодичность: {
+      values: ["Ежемесячная", "Единоразовая", "За семестр", "За год"],
+      state: paymentFrequency,
+      setter: setPaymentFrequency,
+    },
+    Длительность: {
+      values: [
+        "≤ 3 месяцев",
+        "6 месяцев",
+        "10 месяцев",
+        "12 месяцев",
+        "Зависит от решения комиссии",
+      ],
+      state: paymentDuration,
+      setter: setPaymentDuration,
+    },
   };
 
   const toggleExpand = () => {
-    setIsExpanded(!isExpanded);
-    if (!isExpanded) {
+    const newExpanded = !isExpanded;
+    setIsExpanded(newExpanded);
+    if (!newExpanded) {
       setExpandedFilter(null);
+    }
+    onExpandChange?.(newExpanded);
+
+    // Закрываем результаты поиска при открытии/закрытии фильтров
+    if (newExpanded) {
+      onSearchResultsClose?.();
     }
   };
 
-  const toggleFilter = (filterName: string) => {
+  const toggleFilter = (filterName: string, e: React.MouseEvent) => {
+    e.stopPropagation();
     setExpandedFilter(expandedFilter === filterName ? null : filterName);
   };
 
   const handleCheckboxChange = (
-    filterName: string,
+    filterName: keyof typeof filterOptions,
     value: string,
-    checked: boolean
+    checked: boolean,
+    e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const setters: {
-      [key: string]: React.Dispatch<React.SetStateAction<string[]>>;
-    } = {
-      "Тип стипендии": setScholarshipType,
-      "Уровень обучения": setEducationLevel,
-      "Форма обучения": setStudyForm,
-      "Институт / подразделение МИСИС": setInstitute,
-      Курс: setCourse,
-      "Тип достижений": setAchievements,
-      "Размер выплаты": setPaymentAmount,
-      Периодичность: setPaymentFrequency,
-      Длительность: setPaymentDuration,
-    };
-
-    const setter = setters[filterName];
+    e.stopPropagation();
+    const setter = filterOptions[filterName].setter;
     if (setter) {
       setter((prev) =>
         checked ? [...prev, value] : prev.filter((v) => v !== value)
@@ -162,18 +177,15 @@ export const ScholarshipFilters: React.FC<ExpandingFilterProps> = ({
     }
 
     if (typeof amount === "string") {
-      // Извлекаем первое число из строки
       const match = amount.match(/(\d+[\s\d]*)/);
       if (match) {
-        // Убираем пробелы и преобразуем в число
         const numStr = match[1].replace(/\s/g, "");
         return parseInt(numStr, 10);
       }
 
-      // Если есть диапазон (например, "25000-40000")
       const rangeMatch = amount.match(/(\d+)[-\s]+(\d+)/);
       if (rangeMatch) {
-        return parseInt(rangeMatch[1], 10); // Берем нижнюю границу
+        return parseInt(rangeMatch[1], 10);
       }
     }
 
@@ -207,7 +219,6 @@ export const ScholarshipFilters: React.FC<ExpandingFilterProps> = ({
   const applyFilters = useCallback(() => {
     if (!isExpanded) return;
 
-    // Проверяем, изменились ли значения фильтров
     const currentFilterValues = {
       scholarshipType,
       educationLevel,
@@ -228,11 +239,9 @@ export const ScholarshipFilters: React.FC<ExpandingFilterProps> = ({
       !filtersChanged &&
       prevFilteredRef.current.length === scholarships.length
     ) {
-      // Фильтры не изменились, пропускаем повторную фильтрацию
       return;
     }
 
-    // Сохраняем текущие значения фильтров
     prevFilterValuesRef.current = currentFilterValues;
 
     let filtered = [...scholarships];
@@ -287,26 +296,14 @@ export const ScholarshipFilters: React.FC<ExpandingFilterProps> = ({
       filtered = filtered.filter((scholarship) => {
         if (!scholarship.course) return false;
 
-        // Проверяем, если выбран "Любой курс" и это присутствует
         if (course.includes("Любой курс")) {
           return scholarship.course?.includes("Любой курс");
         }
 
-        // Проверяем точные совпадения курсов
         return course.some((c) =>
           scholarship.course?.some((schCourse) => {
-            // Простое совпадение строк
             if (schCourse === c) return true;
 
-            // Если в scholarship.course есть "Магистратура 1" или "Магистратура 2"
-            if (
-              c.startsWith("Магистратура") &&
-              schCourse.startsWith("Магистратура")
-            ) {
-              return true;
-            }
-
-            // Для числовых курсов
             if (!isNaN(Number(c)) && !isNaN(Number(schCourse))) {
               return Number(schCourse) === Number(c);
             }
@@ -354,7 +351,6 @@ export const ScholarshipFilters: React.FC<ExpandingFilterProps> = ({
       });
     }
 
-    // Проверяем, изменился ли результат фильтрации
     const filteredChanged =
       JSON.stringify(filtered) !== JSON.stringify(prevFilteredRef.current);
 
@@ -400,23 +396,17 @@ export const ScholarshipFilters: React.FC<ExpandingFilterProps> = ({
     paymentDuration,
   ]);
 
-  const clearAllFilters = () => {
-    setScholarshipType([]);
-    setEducationLevel([]);
-    setStudyForm([]);
-    setInstitute([]);
-    setCourse([]);
-    setAchievements([]);
-    setPaymentAmount([]);
-    setPaymentFrequency([]);
-    setPaymentDuration([]);
+  const clearAllFilters = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    Object.values(filterOptions).forEach((option) => {
+      option.setter([]);
+    });
   };
 
   const handleClickOutside = (e: React.MouseEvent) => {
     e.stopPropagation();
   };
 
-  // Добавляем обработчик клика вне компонента
   useEffect(() => {
     const handleClickOutsideComponent = (event: MouseEvent) => {
       const filterContainer = document.querySelector(
@@ -424,6 +414,7 @@ export const ScholarshipFilters: React.FC<ExpandingFilterProps> = ({
       );
       if (filterContainer && !filterContainer.contains(event.target as Node)) {
         setIsExpanded(false);
+        onExpandChange?.(false); // Сообщаем об изменении
       }
     };
 
@@ -434,7 +425,71 @@ export const ScholarshipFilters: React.FC<ExpandingFilterProps> = ({
     return () => {
       document.removeEventListener("mousedown", handleClickOutsideComponent);
     };
-  }, [isExpanded]);
+  }, [isExpanded, onExpandChange]);
+
+  // Функция для рендеринга фильтра
+  const renderFilterSection = (filterName: keyof typeof filterOptions) => {
+    const option = filterOptions[filterName];
+    const isExpandedSection = expandedFilter === filterName;
+
+    return (
+      <div key={filterName} className={styles.filterSection}>
+        <div
+          className={styles.filterSectionHeader}
+          onClick={(e) => toggleFilter(filterName, e)}
+        >
+          <img
+            src={isExpandedSection ? openIcon : closeIcon}
+            alt={isExpandedSection ? "open-icon" : "close-icon"}
+            className={styles.filterArrow}
+          />
+          <span>{filterName}</span>
+        </div>
+        {isExpandedSection && (
+          <div className={styles.filterOptions}>
+            {option.values.map((value) => {
+              const isChecked = option.state.includes(value);
+              return (
+                <label
+                  key={value}
+                  className={styles.filterOption}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className={styles.customCheckbox}>
+                    <img
+                      src={isChecked ? checked : notChecked}
+                      alt={isChecked ? "checked" : "not checked"}
+                      className={styles.checkboxIcon}
+                    />
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      onChange={(e) =>
+                        handleCheckboxChange(
+                          filterName,
+                          value,
+                          e.target.checked,
+                          e
+                        )
+                      }
+                      className={styles.hiddenCheckbox}
+                    />
+                  </div>
+                  <span
+                    className={
+                      isChecked ? styles.checkedText : styles.uncheckedText
+                    }
+                  >
+                    {value}
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div
@@ -453,337 +508,13 @@ export const ScholarshipFilters: React.FC<ExpandingFilterProps> = ({
           <div className={styles.filterHeader}>
             <h3>Фильтры</h3>
             <button onClick={clearAllFilters} className={styles.clearButton}>
-              Очистить все
+              Очистить
             </button>
           </div>
 
           <div className={styles.filtersList}>
-            {/* Тип стипендии */}
-            <div className={styles.filterSection}>
-              <div
-                className={styles.filterSectionHeader}
-                onClick={() => toggleFilter("Тип стипендии")}
-              >
-                <span>Тип стипендии</span>
-                <span className={styles.arrow}>
-                  {expandedFilter === "Тип стипендии" ? "▼" : "▶"}
-                </span>
-              </div>
-              {expandedFilter === "Тип стипендии" && (
-                <div className={styles.filterOptions}>
-                  {filterOptions.scholarshipType.map((option) => (
-                    <label key={option} className={styles.filterOption}>
-                      <input
-                        type="checkbox"
-                        checked={scholarshipType.includes(option)}
-                        onChange={(e) =>
-                          handleCheckboxChange(
-                            "Тип стипендии",
-                            option,
-                            e.target.checked
-                          )
-                        }
-                      />
-                      <span>{option}</span>
-                    </label>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Уровень обучения */}
-            <div className={styles.filterSection}>
-              <div
-                className={styles.filterSectionHeader}
-                onClick={() => toggleFilter("Уровень обучения")}
-              >
-                <span>Уровень обучения</span>
-                <span className={styles.arrow}>
-                  {expandedFilter === "Уровень обучения" ? "▼" : "▶"}
-                </span>
-              </div>
-              {expandedFilter === "Уровень обучения" && (
-                <div className={styles.filterOptions}>
-                  {filterOptions.educationLevel.map((option) => (
-                    <label key={option} className={styles.filterOption}>
-                      <input
-                        type="checkbox"
-                        checked={educationLevel.includes(option)}
-                        onChange={(e) =>
-                          handleCheckboxChange(
-                            "Уровень обучения",
-                            option,
-                            e.target.checked
-                          )
-                        }
-                      />
-                      <span>{option}</span>
-                    </label>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Форма обучения */}
-            <div className={styles.filterSection}>
-              <div
-                className={styles.filterSectionHeader}
-                onClick={() => toggleFilter("Форма обучения")}
-              >
-                <span>Форма обучения</span>
-                <span className={styles.arrow}>
-                  {expandedFilter === "Форма обучения" ? "▼" : "▶"}
-                </span>
-              </div>
-              {expandedFilter === "Форма обучения" && (
-                <div className={styles.filterOptions}>
-                  {filterOptions.studyForm.map((option) => (
-                    <label key={option} className={styles.filterOption}>
-                      <input
-                        type="checkbox"
-                        checked={studyForm.includes(option)}
-                        onChange={(e) =>
-                          handleCheckboxChange(
-                            "Форма обучения",
-                            option,
-                            e.target.checked
-                          )
-                        }
-                      />
-                      <span>{option}</span>
-                    </label>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Институт */}
-            <div className={styles.filterSection}>
-              <div
-                className={styles.filterSectionHeader}
-                onClick={() => toggleFilter("Институт / подразделение МИСИС")}
-              >
-                <span>Институт / подразделение МИСИС</span>
-                <span className={styles.arrow}>
-                  {expandedFilter === "Институт / подразделение МИСИС"
-                    ? "▼"
-                    : "▶"}
-                </span>
-              </div>
-              {expandedFilter === "Институт / подразделение МИСИС" && (
-                <div className={styles.filterOptions}>
-                  {filterOptions.institute.map((option) => (
-                    <label key={option} className={styles.filterOption}>
-                      <input
-                        type="checkbox"
-                        checked={institute.includes(option)}
-                        onChange={(e) =>
-                          handleCheckboxChange(
-                            "Институт / подразделение МИСИС",
-                            option,
-                            e.target.checked
-                          )
-                        }
-                      />
-                      <span>{option}</span>
-                    </label>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Курс */}
-            <div className={styles.filterSection}>
-              <div
-                className={styles.filterSectionHeader}
-                onClick={() => toggleFilter("Курс")}
-              >
-                <span>Курс</span>
-                <span className={styles.arrow}>
-                  {expandedFilter === "Курс" ? "▼" : "▶"}
-                </span>
-              </div>
-              {expandedFilter === "Курс" && (
-                <div className={styles.filterOptions}>
-                  {filterOptions.course.map((option) => (
-                    <label key={option} className={styles.filterOption}>
-                      <input
-                        type="checkbox"
-                        checked={course.includes(option)}
-                        onChange={(e) =>
-                          handleCheckboxChange("Курс", option, e.target.checked)
-                        }
-                      />
-                      <span>{option}</span>
-                    </label>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Тип достижений */}
-            <div className={styles.filterSection}>
-              <div
-                className={styles.filterSectionHeader}
-                onClick={() => toggleFilter("Тип достижений")}
-              >
-                <span>Тип достижений</span>
-                <span className={styles.arrow}>
-                  {expandedFilter === "Тип достижений" ? "▼" : "▶"}
-                </span>
-              </div>
-              {expandedFilter === "Тип достижений" && (
-                <div className={styles.filterOptions}>
-                  {filterOptions.achievements.map((option) => (
-                    <label key={option} className={styles.filterOption}>
-                      <input
-                        type="checkbox"
-                        checked={achievements.includes(option)}
-                        onChange={(e) =>
-                          handleCheckboxChange(
-                            "Тип достижений",
-                            option,
-                            e.target.checked
-                          )
-                        }
-                      />
-                      <span>{option}</span>
-                    </label>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Размер выплаты */}
-            <div className={styles.filterSection}>
-              <div
-                className={styles.filterSectionHeader}
-                onClick={() => toggleFilter("Размер выплаты")}
-              >
-                <span>Размер выплаты</span>
-                <span className={styles.arrow}>
-                  {expandedFilter === "Размер выплаты" ? "▼" : "▶"}
-                </span>
-              </div>
-              {expandedFilter === "Размер выплаты" && (
-                <div className={styles.filterOptions}>
-                  {filterOptions.paymentAmount.map((option) => (
-                    <label key={option} className={styles.filterOption}>
-                      <input
-                        type="checkbox"
-                        checked={paymentAmount.includes(option)}
-                        onChange={(e) =>
-                          handleCheckboxChange(
-                            "Размер выплаты",
-                            option,
-                            e.target.checked
-                          )
-                        }
-                      />
-                      <span>{option}</span>
-                    </label>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Периодичность */}
-            <div className={styles.filterSection}>
-              <div
-                className={styles.filterSectionHeader}
-                onClick={() => toggleFilter("Периодичность")}
-              >
-                <span>Периодичность</span>
-                <span className={styles.arrow}>
-                  {expandedFilter === "Периодичность" ? "▼" : "▶"}
-                </span>
-              </div>
-              {expandedFilter === "Периодичность" && (
-                <div className={styles.filterOptions}>
-                  {filterOptions.paymentFrequency.map((option) => (
-                    <label key={option} className={styles.filterOption}>
-                      <input
-                        type="checkbox"
-                        checked={paymentFrequency.includes(option)}
-                        onChange={(e) =>
-                          handleCheckboxChange(
-                            "Периодичность",
-                            option,
-                            e.target.checked
-                          )
-                        }
-                      />
-                      <span>{option}</span>
-                    </label>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Длительность */}
-            <div className={styles.filterSection}>
-              <div
-                className={styles.filterSectionHeader}
-                onClick={() => toggleFilter("Длительность")}
-              >
-                <span>Длительность</span>
-                <span className={styles.arrow}>
-                  {expandedFilter === "Длительность" ? "▼" : "▶"}
-                </span>
-              </div>
-              {expandedFilter === "Длительность" && (
-                <div className={styles.filterOptions}>
-                  {filterOptions.paymentDuration.map((option) => (
-                    <label key={option} className={styles.filterOption}>
-                      <input
-                        type="checkbox"
-                        checked={paymentDuration.includes(option)}
-                        onChange={(e) =>
-                          handleCheckboxChange(
-                            "Длительность",
-                            option,
-                            e.target.checked
-                          )
-                        }
-                      />
-                      <span>{option}</span>
-                    </label>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className={styles.activeFilters}>
-            {scholarshipType.length > 0 && (
-              <span className={styles.activeFilterTag}>
-                Тип: {scholarshipType.length}
-              </span>
-            )}
-            {educationLevel.length > 0 && (
-              <span className={styles.activeFilterTag}>
-                Уровень: {educationLevel.length}
-              </span>
-            )}
-            {studyForm.length > 0 && (
-              <span className={styles.activeFilterTag}>
-                Форма: {studyForm.length}
-              </span>
-            )}
-            {institute.length > 0 && (
-              <span className={styles.activeFilterTag}>
-                Институт: {institute.length}
-              </span>
-            )}
-            {course.length > 0 && (
-              <span className={styles.activeFilterTag}>
-                Курс: {course.length}
-              </span>
-            )}
-            {achievements.length > 0 && (
-              <span className={styles.activeFilterTag}>
-                Достижения: {achievements.length}
-              </span>
+            {Object.keys(filterOptions).map((filterName) =>
+              renderFilterSection(filterName as keyof typeof filterOptions)
             )}
           </div>
         </div>

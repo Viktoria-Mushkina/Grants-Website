@@ -20,9 +20,8 @@
   width: 100%;
 }
 
-/* Уменьшенный инпут при открытых фильтрах */
-.inputCollapsed {
-  width: 300px;
+.searchSection.filtersExpanded .searchInput {
+  width: calc(100% - 320px);
 }
 
 .filterBtn {
@@ -135,5 +134,21 @@
 
   .scholarshipName {
     font-size: 15px;
+  }
+}
+
+/* Адаптация для мобильных */
+@media (max-width: 768px) {
+  .searchContainer {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .searchSection.filtersExpanded .searchInput {
+    width: 100%;
+  }
+
+  .searchContainer.filtersOpen {
+    grid-template-columns: 1fr;
   }
 }
