@@ -4,8 +4,9 @@
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 1000; /* Высокий z-index чтобы быть поверх всего */
-  padding-top: 50px;
+  z-index: 1000;
+  padding: 50px;
+  overflow-y: auto;
 }
 
 .container {
@@ -15,9 +16,10 @@
   background: rgba(1, 38, 53, 0.2);
   color: rgba(255, 255, 255, 1);
   max-width: 1400px;
+  width: 100%;
   margin: 0 auto 20px;
   animation: modalAppear 0.3s ease-out;
-  backdrop-filter: blur(3px);
+  backdrop-filter: blur(10px);
   position: relative;
 }
 @keyframes modalAppear {
@@ -226,11 +228,6 @@
   .detailItem {
     flex-direction: column;
     gap: 5px;
-  }
-
-  .detailItem strong {
-    text-align: left;
-    margin-left: 0;
   }
 
   .detailsButton {

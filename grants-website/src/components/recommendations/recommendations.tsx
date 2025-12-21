@@ -48,22 +48,6 @@ export const Recommendations: React.FC<RecommendationsProps> = ({
     setCurrentSlide(index);
     setTranslateX(-index * 100);
   }, []);
-
-  // Функция для обновления текущего слайда
-  const updateCurrentSlide = useCallback(() => {
-    const totalSlides = totalSlidesRef.current;
-    if (totalSlides === 0) return;
-
-    const slideWidth = 100;
-    const currentPosition = -translateX;
-    const slideIndex = Math.max(
-      0,
-      Math.min(totalSlides - 1, Math.round(currentPosition / slideWidth))
-    );
-
-    setCurrentSlide(slideIndex);
-  }, [translateX]);
-
   // Оптимизированный useEffect с проверкой на реальные изменения
   useEffect(() => {
     // Проверяем, действительно ли данные изменились

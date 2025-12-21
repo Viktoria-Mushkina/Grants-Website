@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import type { Scholarship } from "../../types/scholarship";
 import styles from "./scholarship-details-modal.module.css";
 
@@ -9,6 +10,13 @@ interface ScholarshipDetailsModalProps {
 export const ScholarshipDetailsModal: React.FC<
   ScholarshipDetailsModalProps
 > = ({ scholarship, onClose }) => {
+  useEffect(() => {
+    document.body.classList.add("modal-open");
+
+    return () => {
+      document.body.classList.remove("modal-open");
+    };
+  }, []);
   return (
     <div className={styles.overlay}>
       <div className={styles.container}>
